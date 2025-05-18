@@ -9,7 +9,7 @@ public class DBVerbindung {
 
     public static Connection verbinden() {
         try {
-            Class.forName("org.sqlite.JDBC"); // explizit den Treiber laden
+            Class.forName("org.sqlite.JDBC");
             Connection conn = DriverManager.getConnection(DB_URL);
             System.out.println("Verbindung zur Datenbank erfolgreich.");
             return conn;
@@ -19,5 +19,4 @@ public class DBVerbindung {
             return null;
         }
     }
-
 }
