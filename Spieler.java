@@ -204,7 +204,7 @@ public class Spieler {
     }
 
     public static int getAktuellerSpielerIndex() {
-        // Dummywert, bitte ersetzen durch aktuelle Spielerverwaltung
+     
         return -1;
     }
 

@@ -69,7 +69,7 @@ public class Spielfeld {
 
             neuePosition = Spieler.getStartposition(spielerIndex);
 
-            // Prüfen ob eigene Figur auf dem Startfeld steht
+           
             for (int i = 0; i < figuren.length; i++) {
                 if (i != auswahl && figuren[i] == neuePosition) {
                     System.out.println("Eine eigene Figur steht bereits auf dem Startfeld. Zug nicht möglich.");
@@ -77,7 +77,7 @@ public class Spielfeld {
                 }
             }
 
-            // Prüfen ob gegnerische Figur auf Startfeld steht
+            
             for (int i = 0; i < Spieler.spielerFiguren.length; i++) {
                 if (i != spielerIndex) {
                     for (int j = 0; j < Spieler.spielerFiguren[i].length; j++) {
@@ -95,7 +95,7 @@ public class Spielfeld {
         } else {
             neuePosition = (aktuellePosition + wurf) % spielfeldGroesse;
 
-            // Prüfen ob eigene Figur auf Zielposition steht
+     
             for (int i = 0; i < figuren.length; i++) {
                 if (i != auswahl && figuren[i] == neuePosition) {
                     System.out.println("Du kannst deine eigene Figur nicht schlagen. Zug nicht möglich.");
@@ -103,7 +103,7 @@ public class Spielfeld {
                 }
             }
 
-            // Prüfen ob gegnerische Figur auf Zielposition steht
+          
             for (int i = 0; i < Spieler.spielerFiguren.length; i++) {
                 if (i != spielerIndex) {
                     for (int j = 0; j < Spieler.spielerFiguren[i].length; j++) {
@@ -120,7 +120,7 @@ public class Spielfeld {
         }
     }
 
-    // Hilfsmethode: Globalen Index für Gegner holen
+
     private static int getGlobalIndex(int gegnerIndex) {
         int aktuellerIndex = Spieler.getAktuellerSpielerIndex();
         int globalIndex = 0;
