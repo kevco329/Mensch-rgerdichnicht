@@ -48,7 +48,6 @@ public class Spieler {
             } else {
                 startPositionen[i] = i * (spielfeldGroesse / anzahlSpieler);
             }
-            int zielStart = (startPositionen[i] + spielfeldGroesse - 1) % spielfeldGroesse;
             for (int j = 0; j < 4; j++) {
                 zielFelder[i][j] = spielfeldGroesse + (i * 4) + j;
             }
@@ -63,7 +62,7 @@ public class Spieler {
             int wurf = 0;
             boolean gueltigerZug = false;
 
-            if (!figurAufFeld(spielerFiguren[aktuellerSpieler])) {
+            if (!figurAufFeldOderImZiel(spielerFiguren[aktuellerSpieler])) {
                 for (int i = 1; i <= 3; i++) {
                     System.out.println("Drücke Enter für " + i + ". Wurf...");
                     scanner.nextLine();
@@ -83,11 +82,11 @@ public class Spieler {
 
                             switch (auswahl) {
                                 case "1":
-                                    Spielfeld.zeigeBeweglicheFiguren(spielerFiguren[aktuellerSpieler]);
+                                    Spielfeld.zeigeBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler);
                                     break;
                                 case "2":
                                     int[][] gegnerDaten = getGegnerFiguren(aktuellerSpieler);
-                                    Spielfeld.zeigePositionenAllerFiguren(spielerFiguren[aktuellerSpieler], gegnerDaten);
+                                    Spielfeld.zeigePositionenAllerFiguren(spielerFiguren[aktuellerSpieler], gegnerDaten, aktuellerSpieler);
                                     break;
                                 case "3":
                                     boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
@@ -141,11 +140,11 @@ public class Spieler {
 
                     switch (auswahl) {
                         case "1":
-                            Spielfeld.zeigeBeweglicheFiguren(spielerFiguren[aktuellerSpieler]);
+                            Spielfeld.zeigeBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler);
                             break;
                         case "2":
                             int[][] gegnerDaten = getGegnerFiguren(aktuellerSpieler);
-                            Spielfeld.zeigePositionenAllerFiguren(spielerFiguren[aktuellerSpieler], gegnerDaten);
+                            Spielfeld.zeigePositionenAllerFiguren(spielerFiguren[aktuellerSpieler], gegnerDaten, aktuellerSpieler);
                             break;
                         case "3":
                             boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
@@ -176,13 +175,27 @@ public class Spieler {
         return random.nextInt(6) + 1;
     }
 
-    public static boolean figurAufFeld(int[] figuren) {
+    public static boolean figurAufFeldOderImZiel(int[] figuren) {
+        int aufDemFeld = 0;
+        int imHaus = 0;
+        int imZiel = 0;
+        int maxZielFeld = spielfeldGroesse + 4 * 8;
+
         for (int pos : figuren) {
-            if (pos >= 0 && pos < spielfeldGroesse) {
-                return true;
+            if (pos == -1) imHaus++;
+            else if (pos >= spielfeldGroesse) imZiel++;
+            else aufDemFeld++;
+        }
+
+        if (imHaus == 3 && imZiel == 1) {
+            for (int pos : figuren) {
+                if (pos == maxZielFeld - 1) {
+                    return false;
+                }
             }
         }
-        return false;
+
+        return aufDemFeld > 0 || imZiel > 0;
     }
 
     private static int[][] getGegnerFiguren(int aktuellerSpieler) {
@@ -223,6 +236,6 @@ public class Spieler {
     }
 
     public static int getAktuellerSpielerIndex() {
-        return -1;
+        return -1; // Platzhalter, kann später implementiert werden
     }
 }
