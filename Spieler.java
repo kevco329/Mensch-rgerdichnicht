@@ -8,6 +8,7 @@ public class Spieler {
     static String[] spielerNamen;
     static Random random = new Random();
     static int[] startPositionen;
+    static int[][] zielFelder;
     static int spielfeldGroesse = 40;
 
     public static void spielStarten(Scanner scanner) {
@@ -28,6 +29,7 @@ public class Spieler {
         spielerFiguren = new int[anzahlSpieler][4];
         spielerNamen = new String[anzahlSpieler];
         startPositionen = new int[anzahlSpieler];
+        zielFelder = new int[anzahlSpieler][4];
 
         spielfeldGroesse = (anzahlSpieler <= 4) ? 40 : anzahlSpieler * 10;
         Spielfeld.spielfeldGroesse = spielfeldGroesse;
@@ -45,6 +47,10 @@ public class Spieler {
                 startPositionen[i] = (i == 0) ? 0 : 20;
             } else {
                 startPositionen[i] = i * (spielfeldGroesse / anzahlSpieler);
+            }
+            int zielStart = (startPositionen[i] + spielfeldGroesse - 1) % spielfeldGroesse;
+            for (int j = 0; j < 4; j++) {
+                zielFelder[i][j] = spielfeldGroesse + (i * 4) + j;
             }
         }
 
@@ -85,11 +91,8 @@ public class Spieler {
                                     break;
                                 case "3":
                                     boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
-                                    if (bewegt) {
-                                        gueltigerZug = true;
-                                    } else {
-                                        System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
-                                    }
+                                    if (bewegt) gueltigerZug = true;
+                                    else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                                     break;
                                 case "4":
                                     System.out.println("Zurück zum Hauptmenü...");
@@ -98,7 +101,6 @@ public class Spieler {
                                     System.out.println("Ungültige Eingabe.");
                             }
                         }
-
                         System.out.println("Du darfst erneut würfeln!");
                         break;
                     }
@@ -147,11 +149,8 @@ public class Spieler {
                             break;
                         case "3":
                             boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
-                            if (bewegt) {
-                                zugGemacht = true;
-                            } else {
-                                System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
-                            }
+                            if (bewegt) zugGemacht = true;
+                            else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                             break;
                         case "4":
                             System.out.println("Zurück zum Hauptmenü...");
@@ -161,9 +160,12 @@ public class Spieler {
                     }
                 }
 
-                if (wurf != 6 || chancen >= 3) {
-                    break zugSchleife;
-                }
+                if (wurf != 6 || chancen >= 3) break zugSchleife;
+            }
+
+            if (hatGewonnen(aktuellerSpieler)) {
+                System.out.println("🎉 Spieler " + name + " hat gewonnen! 🎉");
+                break;
             }
 
             aktuellerSpieler = (aktuellerSpieler + 1) % spielerNamen.length;
@@ -199,13 +201,28 @@ public class Spieler {
         return startPositionen[spielerIndex];
     }
 
+    public static int[] getZielfelder(int spielerIndex) {
+        return zielFelder[spielerIndex];
+    }
+
     public static String getSpielerName(int index) {
         return spielerNamen[index];
     }
 
-    public static int getAktuellerSpielerIndex() {
-     
-        return -1;
+    public static int getSpielfeldGroesse() {
+        return spielfeldGroesse;
     }
 
+    public static boolean hatGewonnen(int spielerIndex) {
+        for (int i = 0; i < 4; i++) {
+            if (spielerFiguren[spielerIndex][i] != zielFelder[spielerIndex][3 - i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int getAktuellerSpielerIndex() {
+        return -1;
+    }
 }
