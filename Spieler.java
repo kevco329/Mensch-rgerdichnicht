@@ -48,8 +48,12 @@ public class Spieler {
             } else {
                 startPositionen[i] = i * (spielfeldGroesse / anzahlSpieler);
             }
+            int start = startPositionen[i];
             for (int j = 0; j < 4; j++) {
-                zielFelder[i][j] = spielfeldGroesse + (i * 4) + j;
+                
+                int zielfeld = (start - 1 - j + spielfeldGroesse) % spielfeldGroesse;
+               
+                zielFelder[i][j] = spielfeldGroesse + zielfeld;
             }
         }
 
@@ -179,7 +183,6 @@ public class Spieler {
         int aufDemFeld = 0;
         int imHaus = 0;
         int imZiel = 0;
-        int maxZielFeld = spielfeldGroesse + 4 * 8;
 
         for (int pos : figuren) {
             if (pos == -1) imHaus++;
@@ -188,8 +191,19 @@ public class Spieler {
         }
 
         if (imHaus == 3 && imZiel == 1) {
+            int zielEnde = -1;
+
+            
+            for (int i = 0; i < spielerFiguren.length; i++) {
+                if (spielerFiguren[i] == figuren) {
+                    zielEnde = zielFelder[i][3]; 
+                    break;
+                }
+            }
+
+
             for (int pos : figuren) {
-                if (pos == maxZielFeld - 1) {
+                if (pos == zielEnde) {
                     return false;
                 }
             }
@@ -197,6 +211,7 @@ public class Spieler {
 
         return aufDemFeld > 0 || imZiel > 0;
     }
+
 
     private static int[][] getGegnerFiguren(int aktuellerSpieler) {
         int gegnerAnzahl = spielerFiguren.length - 1;
@@ -236,6 +251,6 @@ public class Spieler {
     }
 
     public static int getAktuellerSpielerIndex() {
-        return -1; // Platzhalter, kann später implementiert werden
+        return -1; 
     }
 }

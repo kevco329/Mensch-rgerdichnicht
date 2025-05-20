@@ -74,7 +74,8 @@ public class Spielfeld {
         int[] zielFelder = Spieler.getZielfelder(spielerIndex);
         for (int i = 0; i < zielFelder.length; i++) {
             if (feld == zielFelder[i]) {
-                return "z" + (i + 1);
+                String name = Spieler.getSpielerName(spielerIndex);
+                return name + (i + 1);
             }
         }
         return "Feld " + feld;
@@ -100,12 +101,22 @@ public class Spielfeld {
         if (aktuellePos == -1) {
             if (wurf == 6) {
                 int start = Spieler.getStartposition(spielerIndex);
-                if (!feldBelegt(start, spielerIndex)) {
+                int gegnerIndex = findeGegnerAufFeld(start, spielerIndex);
+                if (!eigeneFigurAufFeld(figuren, start)) {
+                    if (gegnerIndex != -1) {
+                        int[] gegnerFiguren = Spieler.spielerFiguren[gegnerIndex];
+                        for (int i = 0; i < gegnerFiguren.length; i++) {
+                            if (gegnerFiguren[i] == start) {
+                                gegnerFiguren[i] = -1;
+                            }
+                        }
+                        System.out.println("Du hast eine Figur von " + Spieler.getSpielerName(gegnerIndex) + " geschlagen!");
+                    }
                     figuren[auswahl] = start;
                     System.out.println("Figur " + (auswahl + 1) + " wurde auf das Feld " + start + " gesetzt.");
                     return true;
                 } else {
-                    System.out.println("Startfeld ist belegt. Kein Zug möglich.");
+                    System.out.println("Startfeld ist mit deiner eigenen Figur belegt. Kein Zug möglich.");
                     return false;
                 }
             } else {
@@ -115,13 +126,17 @@ public class Spielfeld {
         }
 
         int[] zielFelder = Spieler.getZielfelder(spielerIndex);
+        int start = Spieler.getStartposition(spielerIndex);
+        int spielfeldEnde = Spieler.getSpielfeldGroesse();
+
+        
         for (int i = 0; i < zielFelder.length; i++) {
             if (aktuellePos == zielFelder[i]) {
                 int naechstesZielfeld = (i + wurf < 4) ? zielFelder[i + wurf] : -1;
                 if (naechstesZielfeld != -1) {
                     if (!feldBelegtZiel(naechstesZielfeld, figuren)) {
                         figuren[auswahl] = naechstesZielfeld;
-                        System.out.println("Figur " + (auswahl + 1) + " zieht auf Zielfeld z" + (i + wurf + 1));
+                        System.out.println("Figur " + (auswahl + 1) + " zieht auf Zielfeld " + Spieler.getSpielerName(spielerIndex) + (i + wurf + 1));
                         return true;
                     } else {
                         System.out.println("Ziel-Feld belegt. Kein Zug möglich.");
@@ -134,50 +149,53 @@ public class Spielfeld {
             }
         }
 
-        int zielStart = zielFelder[0];
-        int spielfeldEnde = Spieler.getSpielfeldGroesse();
-        int neuePos = (aktuellePos + wurf);
-
-        if (aktuellePos < spielfeldEnde && neuePos >= spielfeldEnde) {
-            int differenz = neuePos - (spielfeldEnde - 1);
-            if (differenz >= 1 && differenz <= 4) {
-                int zielfeld = zielFelder[differenz - 1];
-                if (!feldBelegtZiel(zielfeld, figuren)) {
-                    figuren[auswahl] = zielfeld;
-                    System.out.println("Figur " + (auswahl + 1) + " zieht auf Zielfeld z" + differenz);
-                    return true;
+        
+        if (aktuellePos >= 0 && aktuellePos < spielfeldEnde) {
+            int neuePos = (aktuellePos + wurf) % spielfeldEnde;
+            int felderBisStart = (start - aktuellePos - 1 + spielfeldEnde) % spielfeldEnde;
+            if (wurf > felderBisStart && wurf <= felderBisStart + 4) {
+                int zielfeldIndex = wurf - felderBisStart - 1;
+                if (zielfeldIndex >= 0 && zielfeldIndex < 4) {
+                    int zielfeld = zielFelder[zielfeldIndex];
+                    if (!feldBelegtZiel(zielfeld, figuren)) {
+                        figuren[auswahl] = zielfeld;
+                        System.out.println("Figur " + (auswahl + 1) + " zieht auf Zielfeld " + Spieler.getSpielerName(spielerIndex) + (zielfeldIndex + 1));
+                        return true;
+                    } else {
+                        System.out.println("Zielfeld " + Spieler.getSpielerName(spielerIndex) + (zielfeldIndex + 1) + " ist belegt. Kein Zug möglich.");
+                        return false;
+                    }
                 } else {
-                    System.out.println("Zielfeld z" + differenz + " ist belegt. Kein Zug möglich.");
+                    System.out.println("Du brauchst einen exakten Wurf, um ins Ziel zu ziehen.");
                     return false;
                 }
-            } else {
-                System.out.println("Du brauchst einen exakten Wurf, um ins Ziel zu ziehen.");
+            }
+
+         
+            if (eigeneFigurAufFeld(figuren, neuePos)) {
+                System.out.println("Dort steht bereits deine eigene Figur. Kein Zug möglich.");
                 return false;
             }
-        }
 
-        int ziel = (aktuellePos + wurf) % spielfeldEnde;
-        if (eigeneFigurAufFeld(figuren, ziel)) {
-            System.out.println("Dort steht bereits deine eigene Figur. Kein Zug möglich.");
-            return false;
-        }
-
-        int geschlagenerSpieler = findeGegnerAufFeld(ziel, spielerIndex);
-        if (geschlagenerSpieler != -1) {
-            int[] gegnerFiguren = Spieler.spielerFiguren[geschlagenerSpieler];
-            for (int i = 0; i < gegnerFiguren.length; i++) {
-                if (gegnerFiguren[i] == ziel) {
-                    gegnerFiguren[i] = -1;
-                    System.out.println("Du hast eine Figur von " + Spieler.getSpielerName(geschlagenerSpieler) + " geschlagen!");
+            int geschlagenerSpieler = findeGegnerAufFeld(neuePos, spielerIndex);
+            if (geschlagenerSpieler != -1) {
+                int[] gegnerFiguren = Spieler.spielerFiguren[geschlagenerSpieler];
+                for (int i = 0; i < gegnerFiguren.length; i++) {
+                    if (gegnerFiguren[i] == neuePos) {
+                        gegnerFiguren[i] = -1;
+                        System.out.println("Du hast eine Figur von " + Spieler.getSpielerName(geschlagenerSpieler) + " geschlagen!");
+                    }
                 }
             }
+
+            figuren[auswahl] = neuePos;
+            System.out.println("Figur " + (auswahl + 1) + " wurde auf Feld " + neuePos + " bewegt.");
+            return true;
         }
 
-        figuren[auswahl] = ziel;
-        System.out.println("Figur " + (auswahl + 1) + " wurde auf Feld " + ziel + " bewegt.");
-        return true;
+        System.out.println("Zug konnte nicht durchgeführt werden.");
+        return false;
     }
-
     private static boolean feldBelegt(int feld, int aktuellerSpieler) {
         for (int i = 0; i < Spieler.spielerFiguren.length; i++) {
             for (int pos : Spieler.spielerFiguren[i]) {
@@ -212,8 +230,7 @@ public class Spielfeld {
         }
         return -1;
     }
-
-    // ✅ NEUE ERGÄNZUNG: Gewinnprüfung
+    
     public static boolean hatSpielerGewonnen(int[] figuren, int spielerIndex) {
         int[] zielFelder = Spieler.getZielfelder(spielerIndex);
         for (int zielfeld : zielFelder) {
