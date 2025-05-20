@@ -2,6 +2,8 @@ package Menschaergerdichnicht;
 
 import java.util.Random;
 import java.util.Scanner;
+import java.io.PrintWriter;
+
 
 public class Spieler {
     public static int[][] spielerFiguren;
@@ -10,6 +12,28 @@ public class Spieler {
     static int[] startPositionen;
     static int[][] zielFelder;
     static int spielfeldGroesse = 40;
+
+    public static void spielSpeichern() {
+        // Beispielhafte Speicherung in eine Datei
+        try (PrintWriter writer = new PrintWriter("spielstand.txt")) {
+            writer.println(spielerNamen.length);
+            writer.println(spielfeldGroesse);
+            for (String name : spielerNamen) {
+                writer.println(name);
+            }
+            for (int i = 0; i < spielerNamen.length; i++) {
+                for (int figur : spielerFiguren[i]) {
+                    writer.print(figur + " ");
+                }
+                writer.println();
+            }
+            System.out.println("Spiel erfolgreich gespeichert!");
+        } catch (Exception e) {
+            System.out.println("Fehler beim Speichern: " + e.getMessage());
+        }
+        
+    }
+    
 
     public static void spielStarten(Scanner scanner) {
         System.out.print("Wie viele Spieler? (2–8): ");
@@ -80,7 +104,7 @@ public class Spieler {
                             System.out.println("1: Bewegliche Figuren anzeigen");
                             System.out.println("2: Positionen aller Figuren anzeigen");
                             System.out.println("3: Figur auswählen und bewegen");
-                            System.out.println("4: Zurück zum Hauptmenü");
+                            System.out.println("4: Spiel speichern und beenden");
                             System.out.print("Eingabe: ");
                             String auswahl = scanner.nextLine();
 
@@ -98,8 +122,8 @@ public class Spieler {
                                     else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                                     break;
                                 case "4":
-                                    System.out.println("Zurück zum Hauptmenü...");
-                                    return;
+                                	spielSpeichern();
+                                	return;
                                 default:
                                     System.out.println("Ungültige Eingabe.");
                             }
@@ -138,7 +162,7 @@ public class Spieler {
                     System.out.println("1: Bewegliche Figuren anzeigen");
                     System.out.println("2: Positionen aller Figuren anzeigen");
                     System.out.println("3: Figur auswählen und bewegen");
-                    System.out.println("4: Zurück zum Hauptmenü");
+                    System.out.println("4: Spiel speichern und beenden");
                     System.out.print("Eingabe: ");
                     String auswahl = scanner.nextLine();
 
@@ -156,8 +180,9 @@ public class Spieler {
                             else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                             break;
                         case "4":
-                            System.out.println("Zurück zum Hauptmenü...");
-                            return;
+                        	spielSpeichern();
+                        	return;
+
                         default:
                             System.out.println("Ungültige Eingabe.");
                     }
@@ -246,11 +271,14 @@ public class Spieler {
             if (spielerFiguren[spielerIndex][i] != zielFelder[spielerIndex][3 - i]) {
                 return false;
             }
+            
         }
         return true;
     }
+    
 
     public static int getAktuellerSpielerIndex() {
         return -1; 
     }
+    
 }

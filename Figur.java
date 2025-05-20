@@ -1,6 +1,7 @@
 package Menschaergerdichnicht;
 
 public class Figur {
+	
     String[] figurgelb = {"gelb1", "gelb2", "gelb3", "gelb4"};
     String[] figurrot = {"rot1", "rot2", "rot3", "rot4"};
     String[] figurgruen = {"grün1", "grün2", "grün3", "grün4"};
