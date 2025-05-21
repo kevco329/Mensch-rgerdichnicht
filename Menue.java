@@ -1,5 +1,6 @@
 package Menschaergerdichnicht;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Menue {
@@ -22,7 +23,7 @@ public class Menue {
                 case "2":
                 case "spielladen":
                     System.out.println("Spielstand wird geladen...");
-                    String daten = SpeicherManager.spielLaden();
+                    List<Spieler> daten = SpeicherManager.spielLaden();
                     if (daten != null) {
                         System.out.println("Geladene Daten: " + daten);
                         // Hier später Logik zum Wiederherstellen der Spieler/Figuren einbauen

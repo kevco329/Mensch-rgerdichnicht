@@ -1,5 +1,7 @@
 package Menschaergerdichnicht;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.io.PrintWriter;
@@ -266,6 +268,26 @@ public class Spieler {
         return spielfeldGroesse;
     }
 
+
+	private String name;
+	private ArrayList figuren;
+    public Spieler(String name, int[] figurenPositionen) {
+        this.name = name;
+        this.figuren = new ArrayList<>();
+        for (int pos : figurenPositionen) {
+            this.figuren.add(new Figur(pos));
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Figur> getFiguren() {
+        return figuren;
+    }
+
+    
     public static boolean hatGewonnen(int spielerIndex) {
         for (int i = 0; i < 4; i++) {
             if (spielerFiguren[spielerIndex][i] != zielFelder[spielerIndex][3 - i]) {
