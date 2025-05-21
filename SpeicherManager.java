@@ -10,10 +10,11 @@ import java.util.List;
 
 public class SpeicherManager {
 
-	public static void spielSpeichern(List<Spieler> spielerListe, int spielfeldGroesse) {
+	public static void spielSpeichern(List<Spieler> spielerListe, int spielfeldGroesse, int aktuellerSpielerIndex) {
 	    try (PrintWriter writer = new PrintWriter("spielstand.txt")) {
 	        writer.println(spielerListe.size());
 	        writer.println(spielfeldGroesse);
+	        writer.println(aktuellerSpielerIndex); // <--- aktuelle Zeile dazu!
 	        for (Spieler spieler : spielerListe) {
 	            writer.println(spieler.getName());
 	        }
@@ -28,13 +29,14 @@ public class SpeicherManager {
 	        System.out.println("Fehler beim Speichern: " + e.getMessage());
 	    }
 	}
-
-	// LADEN - liest alle Spieler wieder aus der Textdatei
-	public static List<Spieler> spielLaden() {
+	public static LoadedGame spielLaden() {
 	    List<Spieler> spielerListe = new ArrayList<>();
+	    int aktuellerSpielerIndex = 0;
+	    int spielfeldGroesse = 40;
 	    try (BufferedReader reader = new BufferedReader(new FileReader("spielstand.txt"))) {
 	        int anzahlSpieler = Integer.parseInt(reader.readLine());
-	        int spielfeldGroesse = Integer.parseInt(reader.readLine());
+	        spielfeldGroesse = Integer.parseInt(reader.readLine());
+	        aktuellerSpielerIndex = Integer.parseInt(reader.readLine()); // <--- neue Zeile
 	        List<String> namen = new ArrayList<>();
 	        for (int i = 0; i < anzahlSpieler; i++) {
 	            namen.add(reader.readLine());
@@ -48,7 +50,6 @@ public class SpeicherManager {
 	            }
 	            figurenListen.add(figuren);
 	        }
-	        // Spieler-Objekte erzeugen (du brauchst dafür einen passenden Konstruktor in Spieler!)
 	        for (int i = 0; i < anzahlSpieler; i++) {
 	            spielerListe.add(new Spieler(namen.get(i), figurenListen.get(i)));
 	        }
@@ -56,6 +57,19 @@ public class SpeicherManager {
 	    } catch (Exception e) {
 	        System.out.println("Fehler beim Laden: " + e.getMessage());
 	    }
-	    return spielerListe;
+	    // Rückgabe in einer Hilfsklasse
+	    return new LoadedGame(spielerListe, spielfeldGroesse, aktuellerSpielerIndex);
+	}
+
+	// Hilfsklasse für Rückgabe:
+	public static class LoadedGame {
+	    public final List<Spieler> spielerListe;
+	    public final int spielfeldGroesse;
+	    public final int aktuellerSpielerIndex;
+	    public LoadedGame(List<Spieler> spielerListe, int spielfeldGroesse, int aktuellerSpielerIndex) {
+	        this.spielerListe = spielerListe;
+	        this.spielfeldGroesse = spielfeldGroesse;
+	        this.aktuellerSpielerIndex = aktuellerSpielerIndex;
+	    }
 	}
 }

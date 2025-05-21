@@ -23,7 +23,7 @@ public class Menue {
                 case "2":
                 case "spielladen":
                     System.out.println("Spielstand wird geladen...");
-                    List<Spieler> daten = SpeicherManager.spielLaden();
+                    List<Spieler> daten = (List<Spieler>) SpeicherManager.spielLaden();
                     if (daten != null) {
                         System.out.println("Geladene Daten: " + daten);
                         // Hier später Logik zum Wiederherstellen der Spieler/Figuren einbauen
