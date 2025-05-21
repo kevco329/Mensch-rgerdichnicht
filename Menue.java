@@ -1,6 +1,5 @@
 package Menschaergerdichnicht;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Menue {
@@ -20,18 +19,13 @@ public class Menue {
                 case "spielstarten":
                     Spieler.spielStarten(scanner);
                     return; // nach Spielstart nicht wieder ins Menü
+
                 case "2":
                 case "spielladen":
                     System.out.println("Spielstand wird geladen...");
-                    List<Spieler> daten = (List<Spieler>) SpeicherManager.spielLaden();
-                    if (daten != null) {
-                        System.out.println("Geladene Daten: " + daten);
-                        // Hier später Logik zum Wiederherstellen der Spieler/Figuren einbauen
-                    } else {
-                        System.out.println("Kein gespeicherter Spielstand gefunden.");
-                    }
-                    break;
-
+                    int aktuellerSpieler = Spieler.spielLaden();
+                    Spieler.spielFortsetzen(aktuellerSpieler, scanner);
+                    return; // <-- damit du NICHT ins Menü zurückkehrst
                 case "3":
                 case "einstellungen":
                     Einstellung.oeffneEinstellungen(scanner);

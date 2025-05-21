@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.PrintWriter;
-
 
 public class Spieler {
     public static int[][] spielerFiguren;
@@ -15,11 +16,11 @@ public class Spieler {
     static int[][] zielFelder;
     static int spielfeldGroesse = 40;
 
-    public static void spielSpeichern() {
-        // Beispielhafte Speicherung in eine Datei
+    public static void spielSpeichern(int aktuellerSpieler) {
         try (PrintWriter writer = new PrintWriter("spielstand.txt")) {
             writer.println(spielerNamen.length);
             writer.println(spielfeldGroesse);
+            writer.println(aktuellerSpieler); // aktueller Spielerindex
             for (String name : spielerNamen) {
                 writer.println(name);
             }
@@ -33,9 +34,46 @@ public class Spieler {
         } catch (Exception e) {
             System.out.println("Fehler beim Speichern: " + e.getMessage());
         }
-        
     }
-    
+
+    public static int spielLaden() {
+        int aktuellerSpieler = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader("spielstand.txt"))) {
+            int anzahlSpieler = Integer.parseInt(reader.readLine());
+            spielfeldGroesse = Integer.parseInt(reader.readLine());
+            aktuellerSpieler = Integer.parseInt(reader.readLine());
+            spielerNamen = new String[anzahlSpieler];
+            spielerFiguren = new int[anzahlSpieler][4];
+            for (int i = 0; i < anzahlSpieler; i++) {
+                spielerNamen[i] = reader.readLine();
+            }
+            for (int i = 0; i < anzahlSpieler; i++) {
+                String[] posStrings = reader.readLine().trim().split(" ");
+                for (int j = 0; j < 4; j++) {
+                    spielerFiguren[i][j] = Integer.parseInt(posStrings[j]);
+                }
+            }
+            // Startpositionen und Zielfelder erneut berechnen
+            startPositionen = new int[anzahlSpieler];
+            zielFelder = new int[anzahlSpieler][4];
+            for (int i = 0; i < anzahlSpieler; i++) {
+                if (anzahlSpieler == 2) {
+                    startPositionen[i] = (i == 0) ? 0 : 20;
+                } else {
+                    startPositionen[i] = i * (spielfeldGroesse / anzahlSpieler);
+                }
+                int start = startPositionen[i];
+                for (int j = 0; j < 4; j++) {
+                    int zielfeld = (start - 1 - j + spielfeldGroesse) % spielfeldGroesse;
+                    zielFelder[i][j] = spielfeldGroesse + zielfeld;
+                }
+            }
+            System.out.println("Spiel erfolgreich geladen!");
+        } catch (Exception e) {
+            System.out.println("Fehler beim Laden: " + e.getMessage());
+        }
+        return aktuellerSpieler;
+    }
 
     public static void spielStarten(Scanner scanner) {
         System.out.print("Wie viele Spieler? (2–8): ");
@@ -76,15 +114,22 @@ public class Spieler {
             }
             int start = startPositionen[i];
             for (int j = 0; j < 4; j++) {
-                
                 int zielfeld = (start - 1 - j + spielfeldGroesse) % spielfeldGroesse;
-               
                 zielFelder[i][j] = spielfeldGroesse + zielfeld;
             }
         }
 
         int aktuellerSpieler = 0;
+        spielSchleife(aktuellerSpieler, scanner);
+    }
 
+    public static void spielFortsetzen(int aktuellerSpieler, Scanner scanner) {
+        System.out.println(">> SPIEL FORTSETZUNG STARTET, Spieler: " + aktuellerSpieler);
+        spielSchleife(aktuellerSpieler, scanner);
+    }
+
+    // Zentrale Spiellogik, wird von Starten und Fortsetzen genutzt!
+    private static void spielSchleife(int aktuellerSpieler, Scanner scanner) {
         while (true) {
             String name = spielerNamen[aktuellerSpieler];
             System.out.println("\n========== " + name + " ist am Zug ==========");
@@ -124,8 +169,8 @@ public class Spieler {
                                     else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                                     break;
                                 case "4":
-                                	spielSpeichern();
-                                	return;
+                                    spielSpeichern(aktuellerSpieler);
+                                    return;
                                 default:
                                     System.out.println("Ungültige Eingabe.");
                             }
@@ -182,9 +227,8 @@ public class Spieler {
                             else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                             break;
                         case "4":
-                        	spielSpeichern();
-                        	return;
-
+                            spielSpeichern(aktuellerSpieler);
+                            return;
                         default:
                             System.out.println("Ungültige Eingabe.");
                     }
@@ -219,26 +263,20 @@ public class Spieler {
 
         if (imHaus == 3 && imZiel == 1) {
             int zielEnde = -1;
-
-            
             for (int i = 0; i < spielerFiguren.length; i++) {
                 if (spielerFiguren[i] == figuren) {
                     zielEnde = zielFelder[i][3]; 
                     break;
                 }
             }
-
-
             for (int pos : figuren) {
                 if (pos == zielEnde) {
                     return false;
                 }
             }
         }
-
         return aufDemFeld > 0 || imZiel > 0;
     }
-
 
     private static int[][] getGegnerFiguren(int aktuellerSpieler) {
         int gegnerAnzahl = spielerFiguren.length - 1;
@@ -268,9 +306,8 @@ public class Spieler {
         return spielfeldGroesse;
     }
 
-
-	private String name;
-	private ArrayList figuren;
+    private String name;
+    private ArrayList figuren;
     public Spieler(String name, int[] figurenPositionen) {
         this.name = name;
         this.figuren = new ArrayList<>();
@@ -287,20 +324,17 @@ public class Spieler {
         return figuren;
     }
 
-    
     public static boolean hatGewonnen(int spielerIndex) {
         for (int i = 0; i < 4; i++) {
             if (spielerFiguren[spielerIndex][i] != zielFelder[spielerIndex][3 - i]) {
                 return false;
             }
-            
         }
         return true;
     }
-    
 
-    public static int getAktuellerSpielerIndex() {
-        return -1; 
-    }
-    
+    // Optional: Entferne diese Methode, da sie nicht sinnvoll ist
+    // public static int getAktuellerSpielerIndex() {
+    //     return -1; 
+    // }
 }
