@@ -3,7 +3,6 @@ package Menschaergerdichnicht;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
-import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
