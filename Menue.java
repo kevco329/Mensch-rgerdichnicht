@@ -18,18 +18,18 @@ public class Menue {
                 case "1":
                 case "spielstarten":
                     Spieler.spielStarten(scanner);
-                    return; // nach Spielstart nicht wieder ins Menü
+                    return; 
 
                 case "2":
                 case "spielladen":
                     System.out.println("Spielstand wird geladen...");
                     int aktuellerSpieler = Spieler.spielLaden();
                     Spieler.spielFortsetzen(aktuellerSpieler, scanner);
-                    return; // <-- damit du NICHT ins Menü zurückkehrst
+                    return; 
                 case "3":
                 case "einstellungen":
                     Einstellung.oeffneEinstellungen(scanner);
-                    // danach wird die Schleife erneut ausgeführt → Menü wird wieder gezeigt
+                   
                     break;
                 case "4":
                 case "spielbeenden":

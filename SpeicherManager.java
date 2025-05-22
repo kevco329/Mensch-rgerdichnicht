@@ -13,7 +13,7 @@ public class SpeicherManager {
 	    try (PrintWriter writer = new PrintWriter("spielstand.txt")) {
 	        writer.println(spielerListe.size());
 	        writer.println(spielfeldGroesse);
-	        writer.println(aktuellerSpielerIndex); // <--- aktueller Spielerindex
+	        writer.println(aktuellerSpielerIndex); 
 	        for (Spieler spieler : spielerListe) {
 	            writer.println(spieler.getName());
 	        }
@@ -35,7 +35,7 @@ public class SpeicherManager {
 	    try (BufferedReader reader = new BufferedReader(new FileReader("spielstand.txt"))) {
 	        int anzahlSpieler = Integer.parseInt(reader.readLine());
 	        spielfeldGroesse = Integer.parseInt(reader.readLine());
-	        aktuellerSpielerIndex = Integer.parseInt(reader.readLine()); // <--- aktueller Spielerindex!
+	        aktuellerSpielerIndex = Integer.parseInt(reader.readLine()); 
 	        List<String> namen = new ArrayList<>();
 	        for (int i = 0; i < anzahlSpieler; i++) {
 	            namen.add(reader.readLine());
@@ -59,7 +59,7 @@ public class SpeicherManager {
 	    return new LoadedGame(spielerListe, spielfeldGroesse, aktuellerSpielerIndex);
 	}
 
-	// Hilfsklasse für die Rückgabe:
+	
 	public static class LoadedGame {
 	    public final List<Spieler> spielerListe;
 	    public final int spielfeldGroesse;

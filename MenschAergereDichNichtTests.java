@@ -11,7 +11,7 @@ class MenschAergereDichNichtTests {
     void Spielfeld_hatSpielerGewonnen_true() {
         int[] figuren = {40, 39, 38, 37};
         int[] zielFelder = {40, 39, 38, 37};
-        // Annahme: ZielFelder werden so gesetzt
+       
         Menschaergerdichnicht.Spieler.zielFelder = new int[][]{zielFelder};
         assertTrue(Menschaergerdichnicht.Spielfeld.hatSpielerGewonnen(figuren, 0));
     }
@@ -67,9 +67,6 @@ class MenschAergereDichNichtTests {
         assertEquals(-1, geladen.spielerListe.get(0).getFiguren().get(0).getPosition());
     }
 
-    // ---- Menue.java ----
-    // UI-Logik ist schwer automatisiert zu testen
-    // Hier kann man höchstens prüfen, ob Spielstart & Laden Methoden ohne Fehler aufrufbar sind
-    // oder mit Mocks arbeiten (fortgeschritten).
+    
 
 }

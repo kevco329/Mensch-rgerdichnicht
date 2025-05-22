@@ -20,7 +20,7 @@ public class Spieler {
         try (PrintWriter writer = new PrintWriter("spielstand.txt")) {
             writer.println(spielerNamen.length);
             writer.println(spielfeldGroesse);
-            writer.println(aktuellerSpieler); // aktueller Spielerindex
+            writer.println(aktuellerSpieler); 
             for (String name : spielerNamen) {
                 writer.println(name);
             }
@@ -53,7 +53,7 @@ public class Spieler {
                     spielerFiguren[i][j] = Integer.parseInt(posStrings[j]);
                 }
             }
-            // Startpositionen und Zielfelder erneut berechnen
+           
             startPositionen = new int[anzahlSpieler];
             zielFelder = new int[anzahlSpieler][4];
             for (int i = 0; i < anzahlSpieler; i++) {
@@ -86,7 +86,7 @@ public class Spieler {
                     System.out.print("Ungültige Zahl. Bitte 2–8 eingeben: ");
                 }
             } catch (NumberFormatException e) {
-                System.out.print("Ungültige Eingabe. Bitte eine Zahl zwischen 2 und 8: ");
+                System.out.print("Ungültige Eingabe. Bitte eine Zahl zwischen 2 und 8 eingeben: ");
             }
         }
 
@@ -124,15 +124,91 @@ public class Spieler {
     }
 
     public static void spielFortsetzen(int aktuellerSpieler, Scanner scanner) {
-        System.out.println(">> SPIEL FORTSETZUNG STARTET, Spieler: " + aktuellerSpieler);
+        System.out.println(">> Spiel wird fortgesetzt, Spieler: " + aktuellerSpieler);
         spielSchleife(aktuellerSpieler, scanner);
     }
 
-    // Zentrale Spiellogik, wird von Starten und Fortsetzen genutzt!
+   
     private static void spielSchleife(int aktuellerSpieler, Scanner scanner) {
         while (true) {
             String name = spielerNamen[aktuellerSpieler];
             System.out.println("\n========== " + name + " ist am Zug ==========");
+
+            // --- NEU: 3x würfeln, wenn keine Figur auf dem Feld, aber eine im Haus ---
+            int imHaus = 0;
+            int aufDemFeld = 0;
+            int imZiel = 0;
+            for (int pos : spielerFiguren[aktuellerSpieler]) {
+                if (pos == -1) imHaus++;
+                else if (pos >= spielfeldGroesse) imZiel++;
+                else aufDemFeld++;
+            }
+            if (aufDemFeld == 0 && imHaus > 0) {
+                boolean sechsGeworfen = false;
+                int wurf = 0;
+                for (int i = 1; i <= 3; i++) {
+                    System.out.println("Drücke Enter für " + i + ". Wurf...");
+                    scanner.nextLine();
+                    wurf = wuerfeln();
+                    System.out.println("Wurf " + i + ": " + wurf);
+                    if (wurf == 6) {
+                        sechsGeworfen = true;
+                        break;
+                    }
+                }
+                if (!sechsGeworfen) {
+                    System.out.println("Leider keine 6 gewürfelt. Nächster Spieler ist dran.");
+                    aktuellerSpieler = (aktuellerSpieler + 1) % spielerNamen.length;
+                    continue;
+                }
+                if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], 6, aktuellerSpieler)) {
+                    System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                    aktuellerSpieler = (aktuellerSpieler + 1) % spielerNamen.length;
+                    continue;
+                }
+                boolean gueltigerZug = false;
+                while (!gueltigerZug) {
+                    System.out.println("\nDu hast eine 6 gewürfelt!");
+                    System.out.println("Wähle eine Aktion:");
+                    System.out.println("1: Bewegliche Figuren anzeigen");
+                    System.out.println("2: Positionen aller Figuren anzeigen");
+                    System.out.println("3: Figur auswählen und bewegen");
+                    System.out.println("4: Spiel speichern und beenden");
+                    System.out.print("Eingabe: ");
+                    String auswahl = scanner.nextLine();
+
+                    switch (auswahl) {
+                        case "1":
+                            Spielfeld.zeigeBeweglicheFiguren(spielerFiguren[aktuellerSpieler], 6, aktuellerSpieler);
+                            break;
+                        case "2":
+                            int[][] gegnerDaten = getGegnerFiguren(aktuellerSpieler);
+                            Spielfeld.zeigePositionenAllerFiguren(spielerFiguren[aktuellerSpieler], gegnerDaten, aktuellerSpieler);
+                            break;
+                        case "3":
+                            boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, 6, aktuellerSpieler);
+                            if (bewegt) gueltigerZug = true;
+                            else {
+                                // NEU: Nach Fehlversuch prüfen, ob noch ein Zug möglich ist!
+                                if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], 6, aktuellerSpieler)) {
+                                    System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                                    gueltigerZug = true;
+                                } else {
+                                    System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
+                                }
+                            }
+                            break;
+                        case "4":
+                            spielSpeichern(aktuellerSpieler);
+                            return;
+                        default:
+                            System.out.println("Ungültige Eingabe.");
+                    }
+                }
+                System.out.println("Du darfst erneut würfeln!");
+                continue;
+            }
+            // --- ENDE NEU ---
 
             int wurf = 0;
             boolean gueltigerZug = false;
@@ -145,6 +221,12 @@ public class Spieler {
                     System.out.println("Wurf " + i + ": " + wurf);
 
                     if (wurf == 6) {
+                        if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
+                            System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                            aktuellerSpieler = (aktuellerSpieler + 1) % spielerNamen.length;
+                            gueltigerZug = true;
+                            break;
+                        }
                         while (!gueltigerZug) {
                             System.out.println("\nDu hast eine 6 gewürfelt!");
                             System.out.println("Wähle eine Aktion:");
@@ -166,7 +248,14 @@ public class Spieler {
                                 case "3":
                                     boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
                                     if (bewegt) gueltigerZug = true;
-                                    else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
+                                    else {
+                                        if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
+                                            System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                                            gueltigerZug = true;
+                                        } else {
+                                            System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
+                                        }
+                                    }
                                     break;
                                 case "4":
                                     spielSpeichern(aktuellerSpieler);
@@ -194,6 +283,12 @@ public class Spieler {
                 scanner.nextLine();
                 wurf = wuerfeln();
                 System.out.println(name + " hat eine " + wurf + " gewürfelt!");
+
+                // Vor jedem Zug prüfen, ob überhaupt ein Zug möglich ist!
+                if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
+                    System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                    break zugSchleife;
+                }
 
                 if (wurf == 6) {
                     chancen = 0;
@@ -224,7 +319,14 @@ public class Spieler {
                         case "3":
                             boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, wurf, aktuellerSpieler);
                             if (bewegt) zugGemacht = true;
-                            else System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
+                            else {
+                                if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
+                                    System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
+                                    zugGemacht = true; // Schleife verlassen!
+                                } else {
+                                    System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
+                                }
+                            }
                             break;
                         case "4":
                             spielSpeichern(aktuellerSpieler);
@@ -246,6 +348,33 @@ public class Spieler {
         }
     }
 
+    // Fügt ans Ende der Klasse Spieler (außerhalb von spielSchleife) diese Hilfsmethode ein:
+    private static boolean existierenBeweglicheFiguren(int[] figuren, int wurf, int spielerIndex) {
+        int[] zielFelder = getZielfelder(spielerIndex);
+        int start = getStartposition(spielerIndex);
+        int spielfeldGroesse = getSpielfeldGroesse();
+        for (int i = 0; i < figuren.length; i++) {
+            int pos = figuren[i];
+            if (pos == -1 && wurf == 6 && !Spielfeld.eigeneFigurAufFeld(figuren, start)) return true;
+            else if (pos >= 0 && pos < spielfeldGroesse) {
+                int neuePos = (pos + wurf) % spielfeldGroesse;
+                if (!Spielfeld.eigeneFigurAufFeld(figuren, neuePos)) return true;
+                // Möglichkeit ins Ziel
+                int felderBisStart = (start - pos - 1 + spielfeldGroesse) % spielfeldGroesse;
+                if (wurf > felderBisStart && wurf <= felderBisStart + 4) {
+                    int zielfeldIndex = wurf - felderBisStart - 1;
+                    if (zielfeldIndex >= 0 && zielfeldIndex < 4 && !Spielfeld.feldBelegtZiel(zielFelder[zielfeldIndex], figuren)) return true;
+                }
+            } else {
+                for (int j = 0; j < zielFelder.length; j++) {
+                    if (pos == zielFelder[j]) {
+                        if (j + wurf < zielFelder.length && !Spielfeld.feldBelegtZiel(zielFelder[j + wurf], figuren)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     public static int wuerfeln() {
         return random.nextInt(6) + 1;
     }
@@ -333,8 +462,5 @@ public class Spieler {
         return true;
     }
 
-    // Optional: Entferne diese Methode, da sie nicht sinnvoll ist
-    // public static int getAktuellerSpielerIndex() {
-    //     return -1; 
-    // }
+    
 }
