@@ -129,12 +129,12 @@ public class Spielfeld {
         int start = Spieler.getStartposition(spielerIndex);
         int spielfeldEnde = Spieler.getSpielfeldGroesse();
 
-        // Bewegung innerhalb der Zielfelder
+        
         for (int i = 0; i < zielFelder.length; i++) {
             if (aktuellePos == zielFelder[i]) {
                 int naechstesZielfeld = (i + wurf < 4) ? zielFelder[i + wurf] : -1;
                 if (naechstesZielfeld != -1) {
-                    // --- Änderung: Prüfe alle Zielfelder zwischen aktueller Position und Ziel ---
+                    
                     for (int j = i + 1; j <= i + wurf; j++) {
                         if (feldBelegtZiel(zielFelder[j], figuren)) {
                             System.out.println("Du kannst nicht über eine eigene Figur im Zielfeld springen.");
@@ -151,14 +151,14 @@ public class Spielfeld {
             }
         }
 
-        // Bewegung vom normalen Feld ins Ziel
+        
         if (aktuellePos >= 0 && aktuellePos < spielfeldEnde) {
             int neuePos = (aktuellePos + wurf) % spielfeldEnde;
             int felderBisStart = (start - aktuellePos - 1 + spielfeldEnde) % spielfeldEnde;
             if (wurf > felderBisStart && wurf <= felderBisStart + 4) {
                 int zielfeldIndex = wurf - felderBisStart - 1;
                 if (zielfeldIndex >= 0 && zielfeldIndex < 4) {
-                    // --- Änderung: Prüfe alle Zielfelder zwischen Eintritt und Ziel ---
+                    
                     for (int j = 0; j <= zielfeldIndex; j++) {
                         if (feldBelegtZiel(zielFelder[j], figuren)) {
                             System.out.println("Du kannst nicht über eine eigene Figur im Zielfeld springen.");
@@ -174,7 +174,7 @@ public class Spielfeld {
                 }
             }
 
-            // Normale Bewegung auf dem Hauptfeld
+            
             if (eigeneFigurAufFeld(figuren, neuePos)) {
                 System.out.println("Dort steht bereits deine eigene Figur. Kein Zug möglich.");
                 return false;
@@ -248,7 +248,7 @@ public class Spielfeld {
                 return false;
             }
         }
-        // Sicherstellen, dass keine Figur im Haus oder auf dem normalen Feld steht
+        
         for (int pos : figuren) {
             boolean imZielfeld = false;
             for (int zielfeld : zielFelder) {
