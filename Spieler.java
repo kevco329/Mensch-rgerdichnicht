@@ -134,7 +134,7 @@ public class Spieler {
             String name = spielerNamen[aktuellerSpieler];
             System.out.println("\n========== " + name + " ist am Zug ==========");
 
-            // --- NEU: 3x würfeln, wenn keine Figur auf dem Feld, aber eine im Haus ---
+       
             int imHaus = 0;
             int aufDemFeld = 0;
             int imZiel = 0;
@@ -189,7 +189,7 @@ public class Spieler {
                             boolean bewegt = Spielfeld.figurBewegen(spielerFiguren[aktuellerSpieler], scanner, 6, aktuellerSpieler);
                             if (bewegt) gueltigerZug = true;
                             else {
-                                // NEU: Nach Fehlversuch prüfen, ob noch ein Zug möglich ist!
+                               
                                 if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], 6, aktuellerSpieler)) {
                                     System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
                                     gueltigerZug = true;
@@ -208,7 +208,7 @@ public class Spieler {
                 System.out.println("Du darfst erneut würfeln!");
                 continue;
             }
-            // --- ENDE NEU ---
+        
 
             int wurf = 0;
             boolean gueltigerZug = false;
@@ -284,7 +284,7 @@ public class Spieler {
                 wurf = wuerfeln();
                 System.out.println(name + " hat eine " + wurf + " gewürfelt!");
 
-                // Vor jedem Zug prüfen, ob überhaupt ein Zug möglich ist!
+               
                 if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
                     System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
                     break zugSchleife;
@@ -322,7 +322,7 @@ public class Spieler {
                             else {
                                 if (!existierenBeweglicheFiguren(spielerFiguren[aktuellerSpieler], wurf, aktuellerSpieler)) {
                                     System.out.println("Kein Zug möglich. Nächster Spieler ist dran.");
-                                    zugGemacht = true; // Schleife verlassen!
+                                    zugGemacht = true; 
                                 } else {
                                     System.out.println("Ungültiger Versuch. Bitte erneut auswählen.");
                                 }
@@ -348,7 +348,7 @@ public class Spieler {
         }
     }
 
-    // Fügt ans Ende der Klasse Spieler (außerhalb von spielSchleife) diese Hilfsmethode ein:
+   
     private static boolean existierenBeweglicheFiguren(int[] figuren, int wurf, int spielerIndex) {
         int[] zielFelder = getZielfelder(spielerIndex);
         int start = getStartposition(spielerIndex);
@@ -359,7 +359,7 @@ public class Spieler {
             else if (pos >= 0 && pos < spielfeldGroesse) {
                 int neuePos = (pos + wurf) % spielfeldGroesse;
                 if (!Spielfeld.eigeneFigurAufFeld(figuren, neuePos)) return true;
-                // Möglichkeit ins Ziel
+               
                 int felderBisStart = (start - pos - 1 + spielfeldGroesse) % spielfeldGroesse;
                 if (wurf > felderBisStart && wurf <= felderBisStart + 4) {
                     int zielfeldIndex = wurf - felderBisStart - 1;
