@@ -4,15 +4,15 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MenschGUI5 extends JFrame {
-    private static final int SIZE = 15; // Grid-Größe, anpassbar
+    private static final int SIZE = 15; 
     private final JButton[][] fields = new JButton[SIZE][SIZE];
-    // 5 Farben für die Spieler
+  
     private final Color[] playerColors = {
-        new Color(220, 20, 60),      // Rot
-        new Color(255, 215, 0),      // Gelb
-        new Color(0, 200, 70),       // Grün
-        new Color(30, 144, 255),     // Blau
-        new Color(148, 0, 211)       // Lila
+        new Color(220, 20, 60),      
+        new Color(255, 215, 0),      
+        new Color(0, 200, 70),       
+        new Color(30, 144, 255),     
+        new Color(148, 0, 211)       
     };
 
     public MenschGUI5() {
@@ -31,26 +31,26 @@ public class MenschGUI5 extends JFrame {
                 btn.setBorderPainted(true);
                 btn.setEnabled(false);
 
-                // Beispielhafte Häuser-Positionen für 5 Spieler
+                
                 if (isHouse(x, y)) {
                     btn.setBackground(getHouseColor(x, y));
                 }
-                // Startfelder (je Spieler 1, farbig, auf Rundkurs)
+                
                 else if (isStartField(x, y)) {
                     btn.setBackground(getStartColor(x, y));
                     btn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
                     btn.setEnabled(true);
                 }
-                // Zielfelder (4 pro Spieler, farbig, Richtung Mitte)
+           
                 else if (isGoalField(x, y)) {
                     btn.setBackground(getGoalColor(x, y));
                 }
-                // Rundkurs (nur die 50 Felder, ansonsten leer)
+                
                 else if (isPathField(x, y)) {
                     btn.setBackground(Color.BLACK);
                     btn.setEnabled(true);
                 }
-                // Leere Felder
+              
                 else {
                     btn.setBackground(new Color(220, 220, 220));
                     btn.setBorderPainted(false);
@@ -64,23 +64,23 @@ public class MenschGUI5 extends JFrame {
         setVisible(true);
     }
 
-    // Dummy-Logik für Häuser (5 Ecken, je ein 2x2 Bereich)
+    
     private boolean isHouse(int x, int y) {
-        // Du kannst die Positionen anpassen für ein schöneres Layout
+       
         return (x <= 2 && y <= 2) || (x >= 12 && y <= 2) || (x >= 12 && y >= 12) ||
                (x <= 2 && y >= 12) || (x == 7 && y <= 2);
     }
 
     private Color getHouseColor(int x, int y) {
-        if (x <= 2 && y <= 2) return playerColors[0];   // Rot
-        if (x >= 12 && y <= 2) return playerColors[1];  // Gelb
-        if (x >= 12 && y >= 12) return playerColors[2]; // Grün
-        if (x <= 2 && y >= 12) return playerColors[3];  // Blau
-        if (x == 7 && y <= 2) return playerColors[4];   // Lila
+        if (x <= 2 && y <= 2) return playerColors[0];   
+        if (x >= 12 && y <= 2) return playerColors[1];  
+        if (x >= 12 && y >= 12) return playerColors[2]; 
+        if (x <= 2 && y >= 12) return playerColors[3];  
+        if (x == 7 && y <= 2) return playerColors[4];   
         return Color.GRAY;
     }
 
-    // Dummy-Logik für Startfelder (am Rand des Rundkurses, hier als Beispiel)
+    
     private boolean isStartField(int x, int y) {
         return (x == 3 && y == 1) || (x == 13 && y == 3) ||
                (x == 11 && y == 13) || (x == 1 && y == 11) ||
@@ -96,14 +96,13 @@ public class MenschGUI5 extends JFrame {
         return Color.GRAY;
     }
 
-    // Dummy-Logik für Zielfelder (je Farbe 4 Felder Richtung Mitte)
     private boolean isGoalField(int x, int y) {
-        // Beispielhaft: 4 Felder von Rundkurs Richtung Mitte je Spieler
-        return (x == 4 && y >= 3 && y <= 6) || // Rot
-               (y == 4 && x >= 8 && x <= 11) || // Gelb
-               (x == 10 && y >= 8 && y <= 11) || // Grün
-               (y == 10 && x >= 3 && x <= 6) || // Blau
-               (x == 7 && y >= 4 && y <= 7); // Lila (Mitte oben nach unten)
+        
+        return (x == 4 && y >= 3 && y <= 6) || 
+               (y == 4 && x >= 8 && x <= 11) || 
+               (x == 10 && y >= 8 && y <= 11) || 
+               (y == 10 && x >= 3 && x <= 6) || 
+               (x == 7 && y >= 4 && y <= 7); 
     }
 
     private Color getGoalColor(int x, int y) {
@@ -115,14 +114,13 @@ public class MenschGUI5 extends JFrame {
         return Color.GRAY;
     }
 
-    // Dummy-Logik für Rundkurs (50 Felder, als Pentagon - stark vereinfacht für Beispiel!)
     private boolean isPathField(int x, int y) {
-        // Du solltest die 50 Felder exakt verteilen. Hier nur grob für das Beispiel:
-        return ((y == 1 && x >= 3 && x <= 11) ||         // Oben waagerecht
-                (x == 13 && y >= 3 && y <= 11) ||        // Rechts senkrecht
-                (y == 13 && x >= 3 && x <= 11) ||        // Unten waagerecht
-                (x == 1 && y >= 3 && y <= 11) ||         // Links senkrecht
-                (x + y == 14 && x >= 3 && x <= 11));     // Diagonal von links unten nach rechts oben (für Pentagon-Optik)
+       
+        return ((y == 1 && x >= 3 && x <= 11) ||        
+                (x == 13 && y >= 3 && y <= 11) ||        
+                (y == 13 && x >= 3 && x <= 11) ||        
+                (x == 1 && y >= 3 && y <= 11) ||         
+                (x + y == 14 && x >= 3 && x <= 11));     
     }
 
     public static void main(String[] args) {
